@@ -1,26 +1,28 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class Main {
-    static double  val = 60;
-    public static void main(String[] args) {
-        File file = new File("file.txt");
-        //Scanner fileScanner = new Scanner(new File("file.txt"));
-        //FileInputStream inputStream = new FileInputStream("file.txt");
-        System.out.println("Hello world!");
-        Scanner scan = new Scanner(System.in);
-        while (true){
-            String curCom = scan.nextLine();
-            System.out.println(curCom);
-            System.out.println(doCommand(curCom));
+    static double  valDefault = 60;
+    public static void main(String[] args) throws IOException {
+        File file = new File("C:\\Users\\User\\DesKtop\\test.txt");
+        FileInputStream inputStream = new FileInputStream(file);
+        String strVal = "";
+        int iter;
+        while ((iter = inputStream.read()) != -1){
+            strVal += (char)iter;
         }
+        Double val = Double.parseDouble(strVal);
+        Scanner scan = new Scanner(System.in);
+        String curCom = scan.nextLine();
+        System.out.println(doCommand(curCom, val));
     }
 
-    public static String toDollars(String string){
+    public static String toDollars(String string, Double val){
         if (Pattern.matches("[0-9]+.[0-9]{2}[p]",string) == true){
             Double number = Double.parseDouble(string.substring(0, string.indexOf('p')));
             if(number != 0){
@@ -37,7 +39,7 @@ public class Main {
         }
     }
 
-    public static String toRubles(String string){
+    public static String toRubles(String string, Double val){
         if (Pattern.matches("[$][0-9]+.[0-9]{2}", string) == true) {
             Double number = Double.parseDouble(string.substring(1));
             number *= val;
@@ -49,7 +51,7 @@ public class Main {
         }
     }
 
-    public static String doCommand(String string){
+    public static String doCommand(String string, Double val){
         if (!(Pattern.matches("(toDollars|toRubles)[(][(toDollars|toRubles)+.0-9$p ]+[)]", string)) == true ){
             //divArg[i] = toRubles(divArg[i].substring(divArg[i].indexOf('(')+1, divArg[i].lastIndexOf(')')));
             return "errorQ";
@@ -61,7 +63,7 @@ public class Main {
         switch (command){
             case "toDollars":
                 if (divArg.length == 1){
-                    return toDollars(divArg[0]);
+                    return toDollars(divArg[0],val);
                 }
                 if (divArg.length %2 == 0){
                     return "errorQ";
@@ -70,7 +72,7 @@ public class Main {
 
                     for (int i = 0; i < divArg.length; i++){
                         if (Pattern.matches("(toDollars|toRubles)[(][(toDollars|toRubles)+.0-9$p ]+[)]", divArg[i]) == true ){
-                            divArg[i] = doCommand(divArg[i]);
+                            divArg[i] = doCommand(divArg[i], val);
                         }
                     }
                     result += divArg[0];
@@ -82,12 +84,12 @@ public class Main {
                             result = razn(result, divArg[i]);
                         }
                     }
-                    return toDollars(result);
+                    return toDollars(result,val);
                 }
                 //break;
             case  "toRubles":
                 if (divArg.length == 1){
-                    return toRubles(divArg[0]);
+                    return toRubles(divArg[0],val);
                 }
                 if (divArg.length %2 == 0){
                     return "errorQ";
@@ -96,7 +98,7 @@ public class Main {
 
                     for (int i = 0; i < divArg.length; i++){
                         if (Pattern.matches("(toDollars|toRubles)[(][(toDollars|toRubles)+.0-9$p ]+[)]", divArg[i]) == true ){
-                            divArg[i] = doCommand(divArg[i]);
+                            divArg[i] = doCommand(divArg[i],val);
                         }
                     }
                     result += divArg[0];
@@ -108,7 +110,7 @@ public class Main {
                             result = razn(result, divArg[i]);
                         }
                     }
-                    return toRubles(result);
+                    return toRubles(result,val);
                 }
 
             default:
@@ -155,3 +157,4 @@ public class Main {
     }
 
 }
+
